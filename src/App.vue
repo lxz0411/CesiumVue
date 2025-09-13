@@ -1,26 +1,42 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="app-container">
+    <!--场景-->
+    <MainScene />
+    <!--模型面板-->
+    <ModelPanel />
+    <!--轨道显示控制-->
+    <OrbitDisplay />
+  </div>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+<script setup>
+  /* eslint-disable */
+  import * as Cesium from 'cesium'
+  import "./Widgets/widgets.css"
+  import { onMounted } from 'vue';
+  import ModelPanel from './components/ModelPanel.vue';
+  import MainScene from './components/MainScene.vue';
+  import OrbitDisplay from './components/OrbitDisplay.vue';
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NWRkMWY5MC00NTQ5LTQxZDUtYmZlOS00YjZlN2EyZjdmMDIiLCJpZCI6MjkzNzk3LCJpYXQiOjE3NDcwODA5OTJ9.iy0AeAVh1PklRnt8ULJU2UynAdbLjjL3Jh2XOuASYAs';
+
+  window.CESIUM_BASE_URL = "/";
 </script>
-
+ 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  html, body, #app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
+
+  .app-container {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
 </style>
