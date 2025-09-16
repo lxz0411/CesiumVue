@@ -36,21 +36,21 @@
           <input type="color" v-model="orbitColor" @change="updateOrbitColor" />
         </label>
       </div>
-      <div class="control-group">
+      <!-- <div class="control-group">
         <label>
           轨道宽度:
           <input type="range" min="1" max="10" v-model="orbitWidth" @change="updateOrbitWidth" />
           {{ orbitWidth }}px
         </label>
-      </div>
+      </div> -->
       
-      <div class="control-group">
+      <!-- <div class="control-group">
         <label>
           轨道透明度:
           <input type="range" min="0.1" max="1" step="0.1" v-model="orbitOpacity" @change="updateOrbitOpacity" />
           {{ Math.round(orbitOpacity * 100) }}%
         </label>
-      </div>
+      </div> -->
       <div class="control-group">
         <label>
           选择卫星:
@@ -138,6 +138,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import * as Cesium from 'cesium'
+import { getViewer } from '@/utils/utils'
 
 // 响应式数据
 const showOrbit = ref(false)
@@ -161,18 +162,6 @@ let orbitEntity = null
 let satelliteEntity = null
 let allSatelliteEntities = [] // 存储所有卫星实体
 let allOrbitEntities = [] // 存储所有轨道实体
-
-// 获取viewer实例
-const getViewer = () => {
-  console.log('getViewer 被调用')
-  console.log('window.cesiumViewer 存在:', !!window.cesiumViewer)
-  if (window.cesiumViewer) {
-    console.log('返回 viewer 实例')
-    return window.cesiumViewer
-  }
-  console.log('viewer 实例不存在，返回 null')
-  return null
-}
 
 // 切换面板显示/收起
 const togglePanel = () => {
@@ -220,7 +209,7 @@ const showAllSatellites = async () => {
       }
       
       // 创建卫星实体
-      const satelliteEntity = createSatelliteEntityForAll(positions, satellite.sateName, i)
+      const satelliteEntity = createSatelliteEntityForAll(positions, satellite.sateName)
       if (satelliteEntity && satelliteEntity !== null) {
         allSatelliteEntities.push(satelliteEntity)
       }
@@ -283,7 +272,7 @@ const clearAllSatellites = () => {
 }
 
 // 为所有卫星创建轨道实体
-const createOrbitEntityForAll = (positions, satelliteName, index) => {
+const createOrbitEntityForAll = (positions, satelliteName) => {
   console.log(`为卫星 ${satelliteName} 创建轨道实体...`)
   
   if (!viewer) {
@@ -298,12 +287,14 @@ const createOrbitEntityForAll = (positions, satelliteName, index) => {
   }))
   
   // 使用不同的颜色区分不同卫星
-  const colors = [
-    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
-    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43',
-    '#10ac84', '#ee5a24', '#0984e3', '#6c5ce7', '#a29bfe'
-  ]
-  const color = Cesium.Color.fromCssColorString(colors[index % colors.length])
+  // const colors = [
+  //   '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
+  //   '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43',
+  //   '#10ac84', '#ee5a24', '#0984e3', '#6c5ce7', '#a29bfe'
+  // ]
+  // const color = Cesium.Color.fromCssColorString(colors[index % colors.length])
+  const color = Cesium.Color.fromCssColorString('#0000ff')
+
   color.alpha = orbitOpacity.value
   
   const orbitEntity = viewer.entities.add({
@@ -326,7 +317,7 @@ const createOrbitEntityForAll = (positions, satelliteName, index) => {
 }
 
 // 为所有卫星创建卫星实体
-const createSatelliteEntityForAll = (positions, satelliteName, index) => {
+const createSatelliteEntityForAll = (positions, satelliteName) => {
   console.log(`为卫星 ${satelliteName} 创建卫星实体...`)
   
   if (!viewer) {
@@ -346,12 +337,14 @@ const createSatelliteEntityForAll = (positions, satelliteName, index) => {
   }))
   
   // 使用不同的颜色区分不同卫星
-  const colors = [
-    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
-    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43',
-    '#10ac84', '#ee5a24', '#0984e3', '#6c5ce7', '#a29bfe'
-  ]
-  const pointColor = Cesium.Color.fromCssColorString(colors[index % colors.length])
+  // const colors = [
+  //   '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57',
+  //   '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43',
+  //   '#10ac84', '#ee5a24', '#0984e3', '#6c5ce7', '#a29bfe'
+  // ]
+  // const pointColor = Cesium.Color.fromCssColorString(colors[index % colors.length])
+
+  const pointColor = '#0000ff'
   
   try {
     // 创建卫星实体
@@ -739,14 +732,14 @@ const createSatelliteEntity = (positions, satelliteName) => {
       position: timePositions[0].position,
       // 使用3D模型
       model: {
-        uri: '/model/satellite.glb',
+        url: '/model/satellite.glb',
         scale: 1000, // 缩放模型
         minimumPixelSize: 32, // 最小像素大小
         maximumScale: 2000, // 最大缩放
         heightReference: Cesium.HeightReference.NONE,
         show: true // 默认显示模型
       },
-      // 如果模型加载失败，使用点作为备选
+      //如果模型加载失败，使用点作为备选
       point: {
         pixelSize: 20, // 增大点的大小
         color: Cesium.Color.BLUE,
@@ -1074,23 +1067,23 @@ const updateOrbitColor = () => {
 }
 
 // 更新轨道透明度
-const updateOrbitOpacity = () => {
-  if (orbitEntity) {
-    const color = Cesium.Color.fromCssColorString(orbitColor.value)
-    color.alpha = orbitOpacity.value
-    orbitEntity.polyline.material = new Cesium.PolylineGlowMaterialProperty({
-      glowPower: 0.3,
-      color: color
-    })
-  }
-}
+// const updateOrbitOpacity = () => {
+//   if (orbitEntity) {
+//     const color = Cesium.Color.fromCssColorString(orbitColor.value)
+//     color.alpha = orbitOpacity.value
+//     orbitEntity.polyline.material = new Cesium.PolylineGlowMaterialProperty({
+//       glowPower: 0.3,
+//       color: color
+//     })
+//   }
+// }
 
 // 更新轨道宽度
-const updateOrbitWidth = () => {
-  if (orbitEntity) {
-    orbitEntity.polyline.width = orbitWidth.value
-  }
-}
+// const updateOrbitWidth = () => {
+//   if (orbitEntity) {
+//     orbitEntity.polyline.width = orbitWidth.value
+//   }
+// }
 
 // 切换动画播放
 const toggleAnimation = () => {
@@ -1143,16 +1136,17 @@ const resetCamera = () => {
     console.error('无法获取viewer实例')
     return
   }
-  
+  const cameraPosition = new Cesium.Cartesian3(0, 0, 1.5 * 6378137);
+  viewer.camera.lookAt(cameraPosition, Cesium.Cartesian3.ZERO);
   // 设置全局视角，地球居中
-  viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000), // 20000km高度
-    orientation: {
-      heading: 0.0,
-      pitch: Cesium.Math.toRadians(-30),
-      roll: 0.0
-    }
-  })
+  // viewer.camera.setView({
+  //   destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000), // 20000km高度
+  //   orientation: {
+  //     heading: 0.0,
+  //     pitch: Cesium.Math.toRadians(-30),
+  //     roll: 0.0
+  //   }
+  // })
   
   console.log('相机视角已重置到全局视角，地球居中')
 }

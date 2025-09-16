@@ -9,6 +9,7 @@
   Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NWRkMWY5MC00NTQ5LTQxZDUtYmZlOS00YjZlN2EyZjdmMDIiLCJpZCI6MjkzNzk3LCJpYXQiOjE3NDcwODA5OTJ9.iy0AeAVh1PklRnt8ULJU2UynAdbLjjL3Jh2XOuASYAs'
 
   const cesiumContainer = ref(null)
+  
   let viewer = null
 
   onMounted(() => {
@@ -28,7 +29,7 @@
     })
     const controller = viewer.scene.screenSpaceCameraController;
     controller.enableTilt = false;
-    
+
     // 将viewer实例存储到全局，供其他组件使用
     window.cesiumViewer = viewer;
     
@@ -40,8 +41,7 @@
     viewer.clock.currentTime = start.clone();
     viewer.timeline.zoomTo(start, stop);
   })
-
-
+  
   onBeforeUnmount(() => {
     if (viewer) {
       viewer.destroy()

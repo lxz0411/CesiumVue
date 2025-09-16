@@ -5,7 +5,7 @@
       <div class="content">
         <div class="title">模型列表</div>
         <div class="button-grid">
-          <button v-for="i in 14" :key="i" class="grid-button">
+          <button v-for="i in 14" :key="i" class="grid-button" @click="openModelPanel(i)">
             <img :src="getImagePath(i)" alt="模型图片" class="button-image" />
           </button>
         </div>
@@ -25,11 +25,19 @@
         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
       </svg>
     </button>
+    
+    <!-- 引入ModelPosPanel组件 -->
+    <ModelPosPanel />
   </div>
 </template>
 
 <script setup>
   import { ref } from 'vue'
+  import ModelPosPanel from './ModelPosPanel.vue'
+  import { getViewer } from '@/utils/utils'
+  
+
+  
   const collapsed = ref(false)
 
   function toggleCollapsed() {
@@ -40,6 +48,19 @@
 
   //根据模型名称获取对应icon，当前还是使用序列号进行索引，后续要改
   const getImagePath = (index) =>{return `/images/${index}.png`}
+
+  function openModelPanel(index) {
+    // 通过DOM操作打开ModelPosPanel中的弹窗
+    const overlay = document.getElementById('model-overlay')
+    if (overlay) {
+      overlay.style.display = 'flex'
+    }
+    const viewer = getViewer()
+    viewer.clock.shouldAnimate = false
+    // 记录当前点击的按钮名称/索引，供弹窗读取
+    window.selectedModelIndex = index
+    window.selectedModelName = `模型${index}`
+  }
 </script>
 
 <style scoped>
