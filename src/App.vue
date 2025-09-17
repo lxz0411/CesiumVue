@@ -6,6 +6,8 @@
     <ModelPanel />
     <!--轨道显示控制-->
     <OrbitDisplay />
+    <!--模型面板按钮-->
+    <ModelPanelButton />
   </div>
 </template>
 
@@ -17,6 +19,7 @@
   import ModelPanel from './components/ModelPanel.vue';
   import MainScene from './components/MainScene.vue';
   import OrbitDisplay from './components/OrbitDisplay.vue';
+  import ModelPanelButton from './components/ModelPanelButton.vue';
 
   Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NWRkMWY5MC00NTQ5LTQxZDUtYmZlOS00YjZlN2EyZjdmMDIiLCJpZCI6MjkzNzk3LCJpYXQiOjE3NDcwODA5OTJ9.iy0AeAVh1PklRnt8ULJU2UynAdbLjjL3Jh2XOuASYAs';
 

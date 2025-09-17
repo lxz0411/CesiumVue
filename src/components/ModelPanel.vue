@@ -1,30 +1,24 @@
 <template>
   <div>
-    <!-- 面板展开时 -->
-    <div v-if="!collapsed" class="button-panel">
-      <div class="content">
-        <div class="title">模型列表</div>
-        <div class="button-grid">
-          <button v-for="i in 14" :key="i" class="grid-button" @click="openModelPanel(i)">
-            <img :src="getImagePath(i)" alt="模型图片" class="button-image" />
+    <!-- 弹窗遮罩层 -->
+    <div class="model-panel-overlay" id="model-panel-overlay" style="display: none;">
+      <!-- 弹窗内容 -->
+      <div class="model-panel-content">
+        <div class="panel-header">
+          <div class="panel-title">模型列表</div>
+          <button class="close-button" @click="closePanel">
+            <img src="/images/close_icon.png" alt="关闭">
+          </button>
+        </div>
+        
+        <div class="model-grid">
+          <button v-for="i in 14" :key="i" class="model-button" @click="openModelPosPanel(i)">
+            <img :src="getImagePath(i)" alt="模型图片" class="model-image" />
+            <span class="model-name">模型{{ i }}</span>
           </button>
         </div>
       </div>
-      <button class="arrow-btn arrow-left" @click="toggleCollapsed" title="收起面板">
-        <!-- 左箭头SVG -->
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" focusable="false">
-          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
     </div>
-
-    <!-- 面板收起时，屏幕右侧的展开箭头 -->
-    <button v-if="collapsed" class="arrow-btn arrow-right" @click="toggleCollapsed" title="展开面板">
-      <!-- 右箭头SVG -->
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" focusable="false">
-        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-      </svg>
-    </button>
     
     <!-- 引入ModelPosPanel组件 -->
     <ModelPosPanel />
@@ -32,151 +26,160 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  // import { ref } from 'vue'
   import ModelPosPanel from './ModelPosPanel.vue'
   import { getViewer } from '@/utils/utils'
-  
-
-  
-  const collapsed = ref(false)
-
-  function toggleCollapsed() {
-    collapsed.value = !collapsed.value
-  }
-
-
 
   //根据模型名称获取对应icon，当前还是使用序列号进行索引，后续要改
   const getImagePath = (index) =>{return `/images/${index}.png`}
 
-  function openModelPanel(index) {
+  function openModelPosPanel(index) {
     // 通过DOM操作打开ModelPosPanel中的弹窗
     const overlay = document.getElementById('model-overlay')
     if (overlay) {
       overlay.style.display = 'flex'
     }
     const viewer = getViewer()
-    viewer.clock.shouldAnimate = false
+    if(viewer) {
+      viewer.clock.shouldAnimate = false
+    }
     // 记录当前点击的按钮名称/索引，供弹窗读取
     window.selectedModelIndex = index
     window.selectedModelName = `模型${index}`
   }
+
+  function closePanel() {
+    const overlay = document.getElementById('model-panel-overlay')
+    if (overlay) {
+      overlay.style.display = 'none'
+    }
+    const viewer = getViewer()
+    if(viewer && !viewer.clock.shouldAnimate){
+      viewer.clock.shouldAnimate = true
+    }
+  }
 </script>
 
 <style scoped>
-.button-panel {
+.model-panel-overlay {
   position: fixed;
   top: 0;
-  right: 0;
-  height: 100vh;
-  width: 300px;
-  background-color: rgba(0, 0, 0, 0.6);
-  /* border-left: 1px solid #ccc; */
-  box-sizing: border-box;
-  user-select: none;
-  z-index: 9999;
-  padding: 16px 10px 10px 10px; /* 左侧留40px给箭头 */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
 }
 
-.content {
-  flex-grow: 1;
+.model-panel-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.title {
-  font-size: 18px;
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.panel-title {
+  font-size: 24px;
   font-weight: bold;
-  margin-bottom: 16px;
-  text-align: center;
-  color: white;
+  color: #333;
 }
 
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
 
+.close-button:hover {
+  background-color: #f0f0f0;
+}
 
-.button-grid {
-  flex-grow: 1;
+.close-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.model-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(auto, 100px);
-  gap: 18px 12px;
-  overflow-y: scroll;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 20px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
-.grid-button {
-  font-size: 14px;
-  border: 1px solid #999;
-  border-radius: 4px;
+.model-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
   background-color: white;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  aspect-ratio: 1 / 1;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
-.grid-button:hover {
-  background-color: #ddd;
-  scale: 0.98;
+.model-button:hover {
+  border-color: #007bff;
+  background-color: #f8f9ff;
+  transform: scale(0.95);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
 }
 
-.button-image {
-  width: 100%;
-  height: 100%;
+.model-image {
+  width: 60px;
+  height: 60px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 6px;
+  margin-bottom: 8px;
 }
 
-.arrow-btn {
-  width: 30px;
-  height: 60px;
-  background-color: rgba(100, 100, 100, 0.5);
-  border: none;
-  cursor: pointer;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease;
-  outline: none;
-  padding: 0;
+.model-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
 }
 
-.arrow-btn:hover {
-  background-color: rgba(100, 100, 100, 0.8);
+/* 滚动条样式 */
+.model-grid::-webkit-scrollbar {
+  width: 6px;
 }
 
-.arrow-left {
-  position: absolute;
-  left: -31px;
-  top: 50%;
-  transform: translateY(-50%) 0.3s;
-  width: 30px;
-  height: 60px;
-  background-color: rgba(100, 100, 100, 0.5);
-  border-radius: 4px 0 0 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: white;
-  font-size: 24px;
-  user-select: none;
-  border: none;
-  transition: background-color 0.3s ease;
+.model-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
 }
 
-.arrow-right {
-  position: fixed;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  border-radius:  4px 0 0 4px;
-  z-index: 10000;
+.model-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.model-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>
