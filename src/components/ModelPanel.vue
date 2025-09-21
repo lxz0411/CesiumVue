@@ -26,7 +26,6 @@
 </template>
 
 <script setup>
-  // import { ref } from 'vue'
   import ModelPosPanel from './ModelPosPanel.vue'
   import { getViewer } from '@/utils/utils'
 

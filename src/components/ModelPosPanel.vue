@@ -46,6 +46,7 @@
   import { ref } from 'vue'
   import { getViewer } from '@/utils/utils'
 
+
   // 全局状态：等待触发的添加任务（仅保留最近一次）
   let pendingAdd = null
   let tickHandler = null
@@ -55,13 +56,9 @@
 
   // 关闭弹窗函数
   function closePanel() {
-    const viewer = getViewer()
     const overlay = document.getElementById('model-overlay')
     if (overlay) {
       overlay.style.display = 'none'
-    }
-    if(viewer && !viewer.clock.shouldAnimate){
-      viewer.clock.shouldAnimate = true
     }
   }
 
